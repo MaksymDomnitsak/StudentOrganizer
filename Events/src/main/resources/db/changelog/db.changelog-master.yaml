@@ -1,0 +1,87 @@
+databaseChangeLog:
+  - changeSet:
+      id: 7
+      author: Maximuse
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: events
+      changes:
+        - createTable:
+            tableName: events
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: start_of_event
+                  type: TIMESTAMP
+              - column:
+                  name: end_of_event
+                  type: TIMESTAMP
+              - column:
+                  name: subject
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: creator_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_online
+                  type: BOOLEAN
+              - column:
+                  name: auditory_number
+                  type: VARCHAR(255)
+
+        - addForeignKeyConstraint:
+            baseTableName: events
+            baseColumnNames: subject
+            referencedTableName: subject
+            referencedColumnNames: id
+            constraintName: fk_event_subject
+
+        - addForeignKeyConstraint:
+            baseTableName: events
+            baseColumnNames: creator_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_event_creator
+
+        - createTable:
+            tableName: event_attendees
+            columns:
+              - column:
+                  name: event_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: event_attendees
+            baseColumnNames: event_id
+            referencedTableName: events
+            referencedColumnNames: id
+            constraintName: fk_event_attendees_event
+
+        - addForeignKeyConstraint:
+            baseTableName: event_attendees
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_event_attendees_user

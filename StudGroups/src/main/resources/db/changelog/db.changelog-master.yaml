@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: Maximuse
+      preConditions:
+        - onFail: MARK_RAN
+        - and:
+            - not:
+                tableExists:
+                  tableName: groups
+            - not:
+                tableExists:
+                  tableName: students
+      changes:
+        - createTable:
+              tableName: groups
+              columns:
+                - column:
+                    name: id
+                    type: BIGINT
+                    autoIncrement: true
+                    constraints:
+                      primaryKey: true
+                      nullable: false
+                - column:
+                    name: name
+                    type: VARCHAR(255)
+                - column:
+                    name: disabled
+                    type: BOOLEAN
+        - createTable:
+            tableName: students
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: students
+            baseColumnNames: id
+            constraintName: fk_students_user
+            referencedTableName: users
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: students
+            baseColumnNames: group_id
+            constraintName: fk_students_group
+            referencedTableName: groups
+            referencedColumnNames: id

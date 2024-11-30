@@ -1,0 +1,117 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: Maximuse
+      preConditions:
+        - onFail: MARK_RAN
+        - and:
+            - not:
+                tableExists:
+                  tableName: teachers
+            - not:
+                tableExists:
+                  tableName: subjects
+            - not:
+                tableExists:
+                  tableName: schedule
+      changes:
+        - createTable:
+            tableName: teachers
+            columns:
+              - column:
+                  name: teacher_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: teachers
+            baseColumnNames: teacher_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+            constraintName: fk_teacher_user
+
+        - createTable:
+            tableName: subjects
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+
+        - createTable:
+            tableName: schedule
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: subject_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: teacher_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: day_of_week
+                  type: BIGINT
+              - column:
+                  name: is_even_week
+                  type: BOOLEAN
+              - column:
+                  name: lesson_order
+                  type: BIGINT
+              - column:
+                  name: type_of_lesson
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_online
+                  type: BOOLEAN
+              - column:
+                  name: auditory_number
+                  type: VARCHAR(255)
+
+        - addForeignKeyConstraint:
+            baseTableName: schedule
+            baseColumnNames: subject_id
+            referencedTableName: subjects
+            referencedColumnNames: id
+            constraintName: fk_schedule_subject
+
+        - addForeignKeyConstraint:
+            baseTableName: schedule
+            baseColumnNames: teacher_id
+            referencedTableName: teachers
+            referencedColumnNames: teacher_id
+            constraintName: fk_schedule_teacher
+
+        - addForeignKeyConstraint:
+            baseTableName: schedule
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_schedule_group
