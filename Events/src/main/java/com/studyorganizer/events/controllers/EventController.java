@@ -97,25 +97,25 @@ public class EventController {
         return ResponseEntity.ok(event);
     }
 
-    @GetMapping("/creator/{creatorId}")
-    public ResponseEntity<List<EventDtoResponse>> getAllByCreatorId(@PathVariable Long creatorId) {
+    @GetMapping(value = "/creator", params = {"creatorId"})
+    public ResponseEntity<List<EventDtoResponse>> getAllByCreatorId(@RequestParam("creatorId") Long creatorId) {
         List<EventDtoResponse> events = new ArrayList<>();
                 eventService.getAllByCreatorId(creatorId).forEach(event -> events.add(eventMapper.eventToEventDto(event)));
         return ResponseEntity.ok(events);
     }
 
-    @GetMapping("/attendee/{attendeeId}")
-    public ResponseEntity<List<EventDtoResponse>> getByAttendeeId(@PathVariable Long attendeeId) {
+    @GetMapping(value = "/attendee", params = {"attendeeId"})
+    public ResponseEntity<List<EventDtoResponse>> getByAttendeeId(@RequestParam("attendeeId") Long attendeeId) {
         List<EventDtoResponse> events = new ArrayList<>();
                 eventService.getByAttendeeId(attendeeId).forEach(event -> events.add(eventMapper.eventToEventDto(event)));
         return ResponseEntity.ok(events);
     }
 
-    @GetMapping("/attendee/email/{email}")
+    /*@GetMapping("/attendee/email/{email}")
     public ResponseEntity<List<EventDtoResponse>> getByAttendeeEmail(@PathVariable String email) {
         List<EventDtoResponse> events = new ArrayList<>();
                 eventService.getByAttendeeEmail(email).forEach(event -> events.add(eventMapper.eventToEventDto(event)));
         return ResponseEntity.ok(events);
-    }
+    }*/
 }
 

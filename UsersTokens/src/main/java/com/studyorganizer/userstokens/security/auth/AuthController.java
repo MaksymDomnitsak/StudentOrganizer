@@ -60,7 +60,7 @@ public class AuthController {
         String accessToken = response.getAsString("access_token");
         tokenService.saveToken(refreshToken,jwtTokenProvider.getEmailFromToken(token),accessToken,jwtToken);
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("http://localhost:4200"));
+        headers.setLocation(URI.create("http://localhost:4200/events"));
         headers.add("Set-Cookie", "Email="+jwtTokenProvider.getEmailFromToken(token)+"; Path=/; Max-Age=300; SameSite=Lax");
         return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
     }

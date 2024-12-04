@@ -92,7 +92,7 @@ public class GoogleDocsService {
         return switch (type) {
             case "LECTURE" -> "Лекційне заняття";
             case "LABORATORY" -> "Лабораторне заняття";
-            case "PRACTICE" -> "Практичне заняття";
+            case "PRACTICAL" -> "Практичне заняття";
             default -> "";
         };
     }

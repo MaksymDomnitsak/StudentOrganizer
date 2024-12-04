@@ -29,7 +29,7 @@ public class EventDtoResponse {
     List<UserDto> attendees;
 
     @JsonProperty("isOnline")
-    Boolean isOnline;
+    boolean isOnline;
 
     String auditoryNumber;
 }

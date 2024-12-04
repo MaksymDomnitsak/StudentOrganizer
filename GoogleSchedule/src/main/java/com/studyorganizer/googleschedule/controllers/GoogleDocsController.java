@@ -5,6 +5,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.docs.v1.model.*;
 import com.studmodel.Schedule;
+import com.studyorganizer.googleschedule.dto.GoogleDocument;
 import com.studyorganizer.googleschedule.dto.ReportDto;
 import com.studyorganizer.googleschedule.security.AuthService;
 import com.studyorganizer.googleschedule.services.GoogleDocsService;
@@ -44,7 +45,7 @@ public class GoogleDocsController {
     GoogleDocsService googleDocsService;
 
     @PostMapping("/report")
-    public ResponseEntity<String> makeReport(HttpServletRequest request, @RequestBody ReportDto report) throws GeneralSecurityException, IOException, ExecutionException, InterruptedException {
+    public ResponseEntity<GoogleDocument> makeReport(HttpServletRequest request, @RequestBody ReportDto report) throws GeneralSecurityException, IOException, ExecutionException, InterruptedException {
         RestTemplate restTemplate = new RestTemplate();
         String resp = restTemplate.getForObject("http://fmi-schedule.chnu.edu.ua/public/semesters", String.class);
         JSONArray semesters = new JSONArray(resp);
@@ -142,9 +143,7 @@ public class GoogleDocsController {
 
         BatchUpdateDocumentRequest batchRequest = new BatchUpdateDocumentRequest().setRequests(requests);
         service.documents().batchUpdate(createdDoc.getDocumentId(), batchRequest).execute();
-
-        return ResponseEntity.ok(createdDoc.getDocumentId());
+        GoogleDocument doc = new GoogleDocument(createdDoc.getDocumentId());
+        return ResponseEntity.ok(doc);
     }
-
-
 }
