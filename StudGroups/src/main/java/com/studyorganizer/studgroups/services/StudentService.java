@@ -2,7 +2,11 @@ package com.studyorganizer.studgroups.services;
 
 import com.studmodel.Student;
 import com.studyorganizer.studgroups.repositories.StudentRepository;
+import jakarta.transaction.Transactional;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -24,33 +28,48 @@ public class StudentService {
         return st.getGroup().getId();
     }
 
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    public Student getByEmail(String email) {
+        return studentRepository.findByEmail(email).orElseThrow(ResourceNotFoundException::new);
     }
 
-    public Optional<Student> getStudentById(Long id) {
-        return studentRepository.findById(id);
+    public List<Student> getAll() {
+        List<Student> students = studentRepository.findAll();
+        return students;
     }
 
-    public Student createStudent(Student student) {
-        return studentRepository.save(student);
+    public Page<Student> getAll(Pageable pageable)
+    {
+        Page<Student> page = studentRepository.findAll(pageable);
+        return page;
     }
 
-    public Student updateStudent(Long id, Student studentDetails) {
-        return studentRepository.findById(id).map(student -> {
-            student.setEmail(studentDetails.getEmail());
-            student.setFirstName(studentDetails.getFirstName());
-            student.setLastName(studentDetails.getLastName());
-            student.setPatronymicName(studentDetails.getPatronymicName());
-            student.setPhoneNumber(studentDetails.getPhoneNumber());
-            student.setUserRole(studentDetails.getUserRole());
-            student.setEventer(studentDetails.getEventer());
-            student.setGroup(studentDetails.getGroup());
-            return studentRepository.save(student);
-        }).orElseThrow(() -> new RuntimeException("Student not found with id " + id));
+    public Student getById(Long id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Entity was not found  ID: ", id));
     }
+//    public List<Student> getByGroup(Long groupId){
+//        return studentRepository.findAllByGroupId(groupId);
+//    }
+//    public Page<Student> getPageByGroup(Long groupId, Pageable pageable) {
+//        return studentRepository.findStudentsByGroupId(groupId, pageable);
+//    }
 
-    public void deleteStudent(Long id) {
+    @Transactional
+    public void delete(Long id) {
         studentRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Student createStudent(Student newStudent) {
+        return studentRepository.save(newStudent);
+    }
+
+    @Transactional
+    public Student updateStudent(Long id, Student newStudent){
+        Student student = studentRepository.findById(id).orElseThrow(RuntimeException::new);
+        newStudent.setId(id);
+        newStudent.setCreatedAt(student.getCreatedAt());
+        return studentRepository.save(newStudent);
+
     }
 }

@@ -1,5 +1,6 @@
 package com.studyorganizer.scheduleteachsubj.services;
 
+import com.studmodel.Group;
 import com.studmodel.Schedule;
 import com.studmodel.Subject;
 import com.studyorganizer.scheduleteachsubj.repositories.ScheduleRepository;
@@ -37,7 +38,7 @@ public class ScheduleService {
     }
 
     public List<Schedule> getByGroupId(String groupId){
-        return scheduleRepository.findAllByGroupIdOrdered(groupId);
+        return scheduleRepository.findAllByGroupIdOrdered(Long.parseLong(groupId));
     }
 
 
@@ -83,6 +84,10 @@ public class ScheduleService {
 
     public List<Subject> getSubjectsFromScheduleByTeacherId(Long teacherId){
         return scheduleRepository.findSubjectsfromScheduleByTeacher(teacherId);
+    }
+
+    public List<Group> getGroupsFromScheduleByTeacherId(Long teacherId){
+        return scheduleRepository.findGroupsfromScheduleByTeacher(teacherId);
     }
 }
 

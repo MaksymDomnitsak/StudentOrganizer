@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -36,8 +37,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 if (result.getPayload().getExpiration().after(Date.from(Instant.now())) && result.getPayload().getSubject().contains("chnu.edu.ua")) {//&& tokenRepository.findByToken(token).get().getExpiryDate().isBefore(ChronoZonedDateTime.from(LocalDateTime.now()))) {
                     String email = result.getPayload().getSubject();
                     String role = result.getPayload().get("role", String.class);
+                    Boolean eventer = result.getPayload().get("eventer", Boolean.class);
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            email, null, Collections.singletonList(new SimpleGrantedAuthority(role)));
+                            email, null, List.of(new SimpleGrantedAuthority(role),new SimpleGrantedAuthority(eventer.toString())));
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(auth);

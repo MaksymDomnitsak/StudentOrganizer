@@ -134,7 +134,7 @@
         <dependency>
             <groupId>com.studmodel</groupId>
             <artifactId>studmodels</artifactId>
-            <version>1.0-20241129.133424-14</version>
+            <version>1.0-20241208.191537-15</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>

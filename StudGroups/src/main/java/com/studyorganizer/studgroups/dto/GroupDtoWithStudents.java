@@ -15,6 +15,4 @@ public class GroupDtoWithStudents {
 
     List<StudentDtoResponseForGroup> students;
 
-    Boolean disabled;
-
 }

@@ -6,6 +6,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.*;
 import com.studyorganizer.googleschedule.dto.EventDto;
+import com.studyorganizer.googleschedule.dto.ScheduleDto;
 import com.studyorganizer.googleschedule.extras.RandomRequestIdGenerator;
 import com.studyorganizer.googleschedule.security.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,32 +30,31 @@ public class GoogleCalendarController {
 
     @PostMapping("/createSchedule")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> importSchedule(HttpServletRequest request, @RequestBody EventDto eventForm) throws IOException, GeneralSecurityException {
-        System.out.println(eventForm.getSummary());
+    public ResponseEntity<?> importSchedule(HttpServletRequest request, @RequestBody ScheduleDto scheduleForm) throws IOException, GeneralSecurityException {
         Calendar service = new Calendar.Builder(GoogleNetHttpTransport.newTrustedTransport(),
                 GsonFactory.getDefaultInstance(), AuthService.makeCredentials(request))
                 .setApplicationName("StudentOrganizer")
                 .build();
         Event event = new Event();
-        event.setSummary(eventForm.getSummary());
-        event.setLocation(eventForm.getLocation());
-        event.setDescription(eventForm.getDescription());
+        event.setSummary(scheduleForm.getSummary());
+        event.setLocation(scheduleForm.getLocation());
+        event.setDescription(scheduleForm.getDescription());
 
-        LocalTime start = LocalTime.parse(eventForm.getStartTime());
-        LocalTime end = LocalTime.parse(eventForm.getEndTime());
-        DateTime startDateTime =new DateTime(eventForm.getStartDate()+"T"+start.minusHours(2).toString()+":00");
-        DateTime endDateTime = new DateTime(eventForm.getStartDate()+"T"+end.minusHours(2).toString()+":00");
+        LocalTime start = LocalTime.parse(scheduleForm.getStartTime());
+        LocalTime end = LocalTime.parse(scheduleForm.getEndTime());
+        DateTime startDateTime =new DateTime(scheduleForm.getStartDate()+"T"+start.minusHours(2).toString()+":00");
+        DateTime endDateTime = new DateTime(scheduleForm.getStartDate()+"T"+end.minusHours(2).toString()+":00");
         event.setStart(new EventDateTime().setDateTime(startDateTime).setTimeZone("Europe/Kiev"));
         event.setEnd(new EventDateTime().setDateTime(endDateTime).setTimeZone("Europe/Kiev"));
 
-        if (eventForm.getFrequency().equals("weekly")) {
-            event.setRecurrence(Collections.singletonList("RRULE:FREQ=WEEKLY;COUNT=" + eventForm.getRepeats()));
-        } else if (eventForm.getFrequency().equals("two-weeks")) {
-            event.setRecurrence(Collections.singletonList("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=" + eventForm.getRepeats()));
+        if (scheduleForm.getFrequency().equals("weekly")) {
+            event.setRecurrence(Collections.singletonList("RRULE:FREQ=WEEKLY;COUNT=" + scheduleForm.getRepeats()));
+        } else if (scheduleForm.getFrequency().equals("two-weeks")) {
+            event.setRecurrence(Collections.singletonList("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=" + scheduleForm.getRepeats()));
         }
         List<EventAttendee> allAttendees = new ArrayList<>();
 
-        for(String email: eventForm.getAttendeesEmails()){
+        for(String email: scheduleForm.getAttendeesEmails()){
             allAttendees.add(new EventAttendee().setEmail(email));
         }
         event.setAttendees(allAttendees);
@@ -67,7 +67,7 @@ public class GoogleCalendarController {
                 .setOverrides(Arrays.asList(reminderOverrides));
         event.setReminders(reminders);
 
-        if(!eventForm.getConference().equals("none")) {
+        if(!scheduleForm.getConference().equals("none")) {
             ConferenceData conferenceData = new ConferenceData();
             ConferenceSolutionKey conferenceSolution = new ConferenceSolutionKey();
             conferenceSolution.setType("hangoutsMeet");
@@ -79,5 +79,62 @@ public class GoogleCalendarController {
         }
         service.events().insert("primary", event).setConferenceDataVersion(1).execute();
         return ResponseEntity.ok("Ok");
+    }
+
+    @PostMapping("/createEvent")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> importEvent(HttpServletRequest request, @RequestBody EventDto eventForm) throws IOException, GeneralSecurityException {
+        Calendar service = new Calendar.Builder(GoogleNetHttpTransport.newTrustedTransport(),
+                GsonFactory.getDefaultInstance(), AuthService.makeCredentials(request))
+                .setApplicationName("StudentOrganizer")
+                .build();
+        Event event = new Event();
+        event.setLocation(eventForm.getLocation());
+        event.setSummary(eventForm.getSummary());
+        event.setDescription(eventForm.getDescription());
+
+        DateTime startDateTime =new DateTime(eventForm.getStartDateTime().minusHours(2).toString()+":00");
+        DateTime endDateTime = new DateTime(eventForm.getEndDateTime().minusHours(2).toString()+":00");
+        event.setStart(new EventDateTime().setDateTime(startDateTime).setTimeZone("Europe/Kiev"));
+        event.setEnd(new EventDateTime().setDateTime(endDateTime).setTimeZone("Europe/Kiev"));
+
+        event = googleCalendarService(event,eventForm.getFrequency(),eventForm.getRepeats(),eventForm.getAttendeesEmails(), eventForm.getConference());
+        service.events().insert("primary", event).setConferenceDataVersion(1).execute();
+        return ResponseEntity.ok("Ok");
+    }
+
+    private Event googleCalendarService(Event event,String frequency, String repeats, String[] attendeesEmails, String conference){
+        if (frequency.equals("weekly")) {
+            event.setRecurrence(Collections.singletonList("RRULE:FREQ=WEEKLY;COUNT=" + repeats));
+        } else if (frequency.equals("two-weeks")) {
+            event.setRecurrence(Collections.singletonList("RRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=" + repeats));
+        }
+        List<EventAttendee> allAttendees = new ArrayList<>();
+
+        for(String email: attendeesEmails){
+            allAttendees.add(new EventAttendee().setEmail(email));
+        }
+        event.setAttendees(allAttendees);
+        EventReminder[] reminderOverrides = new EventReminder[] {
+                new EventReminder().setMethod("email").setMinutes(12 * 60),
+                new EventReminder().setMethod("popup").setMinutes(15),
+        };
+        Event.Reminders reminders = new Event.Reminders()
+                .setUseDefault(false)
+                .setOverrides(Arrays.asList(reminderOverrides));
+        event.setReminders(reminders);
+
+        if(!conference.equals("none")) {
+            ConferenceData conferenceData = new ConferenceData();
+            ConferenceSolutionKey conferenceSolution = new ConferenceSolutionKey();
+            conferenceSolution.setType("hangoutsMeet");
+            CreateConferenceRequest createConferenceRequest = new CreateConferenceRequest();
+            createConferenceRequest.setRequestId(RandomRequestIdGenerator.generateRandomRequestId());
+            createConferenceRequest.setConferenceSolutionKey(conferenceSolution);
+            conferenceData.setCreateRequest(createConferenceRequest);
+            event.setConferenceData(conferenceData);
+        }
+
+        return event;
     }
 }

@@ -30,20 +30,20 @@ services:
     depends_on:
       - userstokens
 
-  # notes:
-  #   build: ./Notes
-  #   ports:
-  #     - "8082:8082"
-  #   environment:
-  #     - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/StudyOrganizer
-  #     - SPRING_DATASOURCE_USERNAME=postgres
-  #     - SPRING_DATASOURCE_PASSWORD=postgres
-  #     - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-  #   networks:
-  #     - kafka-network
-  #     - vue-network
-  #   depends_on:
-  #     - scheduleteachsubj
+  notes:
+    build: ./Notes
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/StudyOrganizer
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - kafka-network
+      - vue-network
+    depends_on:
+      - scheduleteachsubj
 
   scheduleteachsubj:
     build: ./ScheduleTeachSubj

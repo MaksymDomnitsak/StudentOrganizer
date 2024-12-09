@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -17,12 +18,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUserDetailsService userDetailsService;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -32,14 +32,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String token = getTokenFromRequest(request);
+
             if (token != null) {
-                    Jws<Claims> result = jwtUtils.parseToken(token);
-                if (result.getPayload().getExpiration().after(Date.from(Instant.now())) && result.getPayload().getSubject().contains("chnu.edu.ua")) {//&& tokenRepository.findByToken(token).get().getExpiryDate().isBefore(ChronoZonedDateTime.from(LocalDateTime.now()))) {
+                Jws<Claims> result = jwtUtils.parseToken(token);
+                if (result.getPayload().getExpiration().after(Date.from(Instant.now())) && result.getPayload().getSubject().contains("chnu.edu.ua")) {
                     String email = result.getPayload().getSubject();
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(email,token);
+                    String role = result.getPayload().get("role", String.class);
+                    Boolean eventer = result.getPayload().get("eventer", Boolean.class);
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities()
-                    );
+                            email, null, List.of(new SimpleGrantedAuthority(role),new SimpleGrantedAuthority(eventer.toString().toUpperCase())));
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(auth);

@@ -14,6 +14,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -74,18 +75,22 @@ public class EventController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('TRUE')")
     public ResponseEntity<EventDtoResponse> createEvent(@RequestBody EventDtoRequest eventDtoRequest) {
+        System.out.println(eventDtoRequest.getEndTime());
         EventDtoResponse createdEvent =  eventMapper.eventToEventDto(eventService.createEvent(eventDtoRequest));
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('TRUE')")
     public ResponseEntity<EventDtoResponse> updateEvent(@PathVariable Long id, @RequestBody EventDtoRequest eventDtoRequest) {
         EventDtoResponse updatedEvent = eventMapper.eventToEventDto(eventService.updateEvent(id, eventDtoRequest));
         return ResponseEntity.ok(updatedEvent);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('TRUE')")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
         return ResponseEntity.noContent().build();
@@ -110,12 +115,5 @@ public class EventController {
                 eventService.getByAttendeeId(attendeeId).forEach(event -> events.add(eventMapper.eventToEventDto(event)));
         return ResponseEntity.ok(events);
     }
-
-    /*@GetMapping("/attendee/email/{email}")
-    public ResponseEntity<List<EventDtoResponse>> getByAttendeeEmail(@PathVariable String email) {
-        List<EventDtoResponse> events = new ArrayList<>();
-                eventService.getByAttendeeEmail(email).forEach(event -> events.add(eventMapper.eventToEventDto(event)));
-        return ResponseEntity.ok(events);
-    }*/
 }
 

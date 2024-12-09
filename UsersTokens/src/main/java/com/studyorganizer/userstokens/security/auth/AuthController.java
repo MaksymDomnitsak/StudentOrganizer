@@ -55,7 +55,7 @@ public class AuthController {
         HttpEntity<MultiValueMap<String, String>> requestEntity = getMultiValueMapHttpEntity(code, scope);
         JSONObject response = restTemplate.postForObject(TOKEN_URI, requestEntity, JSONObject.class);
         String token = response.getAsString("id_token");
-        String jwtToken = jwtTokenProvider.generateToken(jwtTokenProvider.getEmailFromToken(token), jwtTokenProvider.getRoleFromDB(token));
+        String jwtToken = jwtTokenProvider.generateToken(jwtTokenProvider.getEmailFromToken(token), jwtTokenProvider.getRoleFromDB(token), jwtTokenProvider.getEventerFromUser(token));
         String refreshToken = response.getAsString("refresh_token");
         String accessToken = response.getAsString("access_token");
         tokenService.saveToken(refreshToken,jwtTokenProvider.getEmailFromToken(token),accessToken,jwtToken);
@@ -98,7 +98,7 @@ public class AuthController {
         JSONObject response = restTemplate.postForObject(TOKEN_URI, entity, JSONObject.class);
         String token = response.getAsString("id_token");
         User user = userService.getUserByEmail(jwtTokenProvider.getEmailFromToken(token));
-        String jwtToken = jwtTokenProvider.generateToken(jwtTokenProvider.getEmailFromToken(token), jwtTokenProvider.getRoleFromDB(token));
+        String jwtToken = jwtTokenProvider.generateToken(jwtTokenProvider.getEmailFromToken(token), jwtTokenProvider.getRoleFromDB(token), jwtTokenProvider.getEventerFromUser(token));
         String accessToken = response.getAsString("access_token");
         AuthResponse authResponse = new AuthResponse(user.getId(),user.getEmail(),user.getLastName()+" "+user.getFirstName(),
                 user.getEventer(),"Bearer "+jwtToken,accessToken,user.getUserRole());

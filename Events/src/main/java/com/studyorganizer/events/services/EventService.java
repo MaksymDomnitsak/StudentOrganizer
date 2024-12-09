@@ -39,8 +39,11 @@ public class EventService {
 
     public Event createEvent(EventDtoRequest event) {
         Event newEvent = new Event();
-        Subject subject = new Subject();
-        subject.setId(event.getSubject());
+        if(event.getSubject() != 0) {
+            Subject subject = new Subject();
+            subject.setId(event.getSubject());
+            newEvent.setSubject(subject);
+        }
         User creator = new User();
         creator.setId(event.getCreator());
         List<User> users = new ArrayList<>();
@@ -49,7 +52,6 @@ public class EventService {
             user.setId(id);
             users.add(user);
         }
-        newEvent.setSubject(subject);
         newEvent.setCreator(creator);
         newEvent.setAttendees(users);
         newEvent.setAuditoryNumber(event.getAuditoryNumber());
@@ -75,7 +77,7 @@ public class EventService {
             event.setTitle(eventDetails.getTitle());
             event.setStartTime(eventDetails.getStartTime());
             event.setEndTime(eventDetails.getEndTime());
-            event.setSubject(subject);
+            if(subject.getId() != 0) event.setSubject(subject);
             event.setCreator(creator);
             event.setAttendees(users);
             event.setOnline(eventDetails.getIsOnline());

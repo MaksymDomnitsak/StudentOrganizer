@@ -12,6 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventDtoRequest {
+    Long id;
+
     String title;
 
     LocalDateTime startTime;

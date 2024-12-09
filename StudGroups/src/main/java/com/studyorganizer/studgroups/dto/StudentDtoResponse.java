@@ -1,18 +1,18 @@
 package com.studyorganizer.studgroups.dto;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.FieldDefaults;
+import lombok.NoArgsConstructor;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
 @Data
-public class StudentDtoResponseForGroup{
+@NoArgsConstructor
+@AllArgsConstructor
+public class StudentDtoResponse {
     Long id;
     String firstName;
     String lastName;
     String patronymicName;
     String email;
     String phoneNumber;
+    GroupDto group;
 }

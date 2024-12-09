@@ -34,7 +34,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             String token = getTokenFromRequest(request);
             if (token != null) {
                     Jws<Claims> result = jwtUtils.parseToken(token);
-                if (result.getPayload().getExpiration().after(Date.from(Instant.now())) && result.getPayload().getSubject().contains("chnu.edu.ua")) {//&& tokenRepository.findByToken(token).get().getExpiryDate().isBefore(ChronoZonedDateTime.from(LocalDateTime.now()))) {
+                if (result.getPayload().getExpiration().after(Date.from(Instant.now())) && result.getPayload().getSubject().contains("chnu.edu.ua")) {
                     String email = result.getPayload().getSubject();
                     UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(

@@ -57,15 +57,15 @@ public class UserController {
         return mapper.userToDtoUser(userService.createUser(mapper.userDtoToUser(user)));
     }
 
+
     @PutMapping("/{id}")
-    @PreAuthorize("#id == authentication.principal.id or hasAnyAuthority('ADMIN')")
     public UserDtoResponse updateUser(@PathVariable("id") Long id,
                                       @RequestBody UserDtoRequest user){
         return mapper.userToDtoUser(userService.updateUser(id, mapper.userDtoToUser(user)));
     }
 
+
     @DeleteMapping("/{id}")
-    @PreAuthorize("#id == authentication.principal.id or hasAnyAuthority('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();

@@ -38,10 +38,11 @@ public class JwtUtils {
     @Value("${StudyOrganizer.app.jwtExpirationMs}")
     private long jwtExpiration;
 
-    public String generateToken(String email, String role) {
+    public String generateToken(String email, String role, Boolean eventer) {
         return Jwts.builder().audience().add(CLIENT_ID).and().issuer("https://accounts.google.com")
                 .subject(email).claim("hd", email.substring(email.indexOf("@")+1))
                 .claim("role", role)
+                .claim("eventer", eventer)
                 .issuedAt(new Date()).expiration(new Date(new Date().getTime() + jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
@@ -71,6 +72,10 @@ public class JwtUtils {
 
     public Long getUserIDFromUser(String token) throws GeneralSecurityException, IOException {
         return ((JwtUser) service.loadUserByUsername(getEmailFromCustomToken(token))).getId();
+    }
+
+    public Boolean getEventerFromUser(String token) throws GeneralSecurityException, IOException {
+        return ((JwtUser) service.loadUserByUsername(getEmailFromToken(token))).getEventer();
     }
 
     private Key getSignInKey() {

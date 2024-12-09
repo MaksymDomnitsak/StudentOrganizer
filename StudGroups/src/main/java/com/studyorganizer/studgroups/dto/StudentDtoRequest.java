@@ -1,16 +1,16 @@
-package com.studyorganizer.events.dto;
+package com.studyorganizer.studgroups.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-    Long id;
+@NoArgsConstructor
+public class StudentDtoRequest {
     String firstName;
     String lastName;
     String patronymicName;
     String email;
+    Long groupId;
 }
